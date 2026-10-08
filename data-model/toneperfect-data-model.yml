@@ -1,0 +1,71 @@
+generated: '2026-10-08'
+method: derived
+generator: derive-data-model.py
+source:
+- openapi/toneperfect-openapi.json
+notation: has_one = property $ref; has_many = array of $ref; belongs_to = <entity>_id field
+summary:
+  entities: 11
+  entities_in_spec: 11
+  relationships: 8
+entities:
+- name: Assessment
+  fields: 19
+- name: Billing
+  fields: 4
+- name: Capabilities
+  fields: 3
+- name: CompactAssessment
+  fields: 11
+- name: Component
+  fields: 8
+  description: A Mandarin syllable component (initial, final or tone).
+- name: Error
+  fields: 4
+- name: Phone
+  fields: 10
+  description: One sound. Mandarin rows describe a syllable component (`dimension` initial, final or tone; tones
+    are integers 1–5). Other languages describe a phoneme with timing and an alignment operation.
+- name: Scores
+  fields: 8
+  description: 0–100 display grades. Unsupported dimensions are null; null is never a zero score. `integrity` is
+    completeness.
+- name: StatusWindow
+  fields: 6
+- name: Syllable
+  fields: 5
+- name: Word
+  fields: 9
+relationships:
+- from: Error
+  to: Billing
+  type: has_one
+  via: billing
+- from: Word
+  to: Phone
+  type: has_many
+  via: phones
+- from: CompactAssessment
+  to: Scores
+  type: has_one
+  via: scores
+- from: CompactAssessment
+  to: Billing
+  type: has_one
+  via: billing
+- from: Assessment
+  to: Scores
+  type: has_one
+  via: scores
+- from: Assessment
+  to: Word
+  type: has_many
+  via: words
+- from: Assessment
+  to: Syllable
+  type: has_many
+  via: syllables
+- from: Assessment
+  to: Billing
+  type: has_one
+  via: billing

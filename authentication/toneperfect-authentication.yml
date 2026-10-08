@@ -1,0 +1,15 @@
+generated: '2026-10-08'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://api.toneperfect.app/quickstart/
+sources:
+- https://api.toneperfect.app/quickstart/
+description: Authentication for TonePerfect Pronunciation Assessment API
+schemes:
+- type: http-bearer
+  name: Bearer
+  evidence: Create an account , open API keys in the dashboard and create a key. It starts with tp_live_ and is shown once.
+  location: header
+  header: Authorization
+  how_to_obtain: Create an account, open API keys in the dashboard and create a key.
+docs: https://api.toneperfect.app/quickstart/

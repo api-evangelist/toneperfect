@@ -1,0 +1,21 @@
+{
+  "provider": "toneperfect",
+  "sources": [
+    "toneperfect-openapi.json"
+  ],
+  "outputs": [
+    "toneperfect-assessment-api-openapi.yml",
+    "toneperfect-capabilities-api-openapi.yml",
+    "toneperfect-utilities-api-openapi.yml"
+  ],
+  "archived": [
+    "archived openapi/toneperfect-openapi.json"
+  ],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "toneperfect-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "apis.yml register: written (+3 apis, 3 total)"
+  ],
+  "skipped": []
+}

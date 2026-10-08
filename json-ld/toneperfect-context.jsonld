@@ -1,0 +1,269 @@
+{
+  "@context": {
+    "@vocab": "https://toneperfect.app/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "toneperfect": "https://toneperfect.app/schema#",
+    "Error": "toneperfect:Error",
+    "error": {
+      "@id": "toneperfect:error"
+    },
+    "request_id": {
+      "@id": "toneperfect:request_id",
+      "@type": "xsd:string"
+    },
+    "id": {
+      "@id": "toneperfect:id",
+      "@type": "xsd:string"
+    },
+    "billing": {
+      "@id": "toneperfect:billing",
+      "@type": "@id"
+    },
+    "StatusWindow": "toneperfect:StatusWindow",
+    "checks": {
+      "@id": "toneperfect:checks",
+      "@type": "xsd:integer"
+    },
+    "ok": {
+      "@id": "toneperfect:ok",
+      "@type": "xsd:integer"
+    },
+    "success_rate": {
+      "@id": "toneperfect:success_rate",
+      "@type": "xsd:decimal"
+    },
+    "p50_latency_ms": {
+      "@id": "toneperfect:p50_latency_ms",
+      "@type": "xsd:integer"
+    },
+    "p90_latency_ms": {
+      "@id": "toneperfect:p90_latency_ms",
+      "@type": "xsd:integer"
+    },
+    "busy_skipped": {
+      "@id": "toneperfect:busy_skipped",
+      "@type": "xsd:integer"
+    },
+    "Billing": "toneperfect:Billing",
+    "credits": {
+      "@id": "toneperfect:credits",
+      "@type": "xsd:integer"
+    },
+    "balance_credits": {
+      "@id": "toneperfect:balance_credits",
+      "@type": "xsd:integer"
+    },
+    "free_credits": {
+      "@id": "toneperfect:free_credits",
+      "@type": "xsd:integer"
+    },
+    "source": {
+      "@id": "toneperfect:source",
+      "@type": "xsd:string"
+    },
+    "Scores": "toneperfect:Scores",
+    "overall": {
+      "@id": "toneperfect:overall",
+      "@type": "xsd:decimal"
+    },
+    "pronunciation": {
+      "@id": "toneperfect:pronunciation",
+      "@type": "xsd:decimal"
+    },
+    "initial": {
+      "@id": "toneperfect:initial",
+      "@type": "xsd:decimal"
+    },
+    "final": {
+      "@id": "toneperfect:final",
+      "@type": "xsd:decimal"
+    },
+    "tone": {
+      "@id": "toneperfect:tone",
+      "@type": "xsd:decimal"
+    },
+    "integrity": {
+      "@id": "toneperfect:integrity",
+      "@type": "xsd:decimal"
+    },
+    "fluency": {
+      "@id": "toneperfect:fluency",
+      "@type": "xsd:decimal"
+    },
+    "rhythm": {
+      "@id": "toneperfect:rhythm",
+      "@type": "xsd:decimal"
+    },
+    "Phone": "toneperfect:Phone",
+    "dimension": {
+      "@id": "toneperfect:dimension",
+      "@type": "xsd:string"
+    },
+    "expected": {
+      "@id": "toneperfect:expected",
+      "@type": "xsd:string"
+    },
+    "heard": {
+      "@id": "toneperfect:heard",
+      "@type": "xsd:string"
+    },
+    "score": {
+      "@id": "toneperfect:score",
+      "@type": "xsd:decimal"
+    },
+    "decision": {
+      "@id": "toneperfect:decision",
+      "@type": "xsd:string"
+    },
+    "flagged": {
+      "@id": "toneperfect:flagged",
+      "@type": "xsd:boolean"
+    },
+    "start_ms": {
+      "@id": "toneperfect:start_ms",
+      "@type": "xsd:integer"
+    },
+    "end_ms": {
+      "@id": "toneperfect:end_ms",
+      "@type": "xsd:integer"
+    },
+    "operation": {
+      "@id": "toneperfect:operation",
+      "@type": "xsd:string"
+    },
+    "diagnosis_status": {
+      "@id": "toneperfect:diagnosis_status",
+      "@type": "xsd:string"
+    },
+    "Word": "toneperfect:Word",
+    "word": {
+      "@id": "toneperfect:word",
+      "@type": "xsd:string"
+    },
+    "pinyin": {
+      "@id": "toneperfect:pinyin",
+      "@type": "xsd:string"
+    },
+    "expected_ipa": {
+      "@id": "toneperfect:expected_ipa",
+      "@type": "xsd:string"
+    },
+    "omission_suspected": {
+      "@id": "toneperfect:omission_suspected",
+      "@type": "xsd:boolean"
+    },
+    "phones": {
+      "@id": "toneperfect:phones",
+      "@container": "@list"
+    },
+    "Component": "toneperfect:Component",
+    "agrees_with_prompt": {
+      "@id": "toneperfect:agrees_with_prompt",
+      "@type": "xsd:boolean"
+    },
+    "confidence": {
+      "@id": "toneperfect:confidence",
+      "@type": "xsd:string"
+    },
+    "alternatives": {
+      "@id": "toneperfect:alternatives",
+      "@container": "@list"
+    },
+    "advice": {
+      "@id": "toneperfect:advice",
+      "@type": "xsd:string"
+    },
+    "Syllable": "toneperfect:Syllable",
+    "index": {
+      "@id": "toneperfect:index",
+      "@type": "xsd:integer"
+    },
+    "span_ms": {
+      "@id": "toneperfect:span_ms",
+      "@container": "@list"
+    },
+    "components": {
+      "@id": "toneperfect:components"
+    },
+    "CompactAssessment": "toneperfect:CompactAssessment",
+    "assessable": {
+      "@id": "toneperfect:assessable",
+      "@type": "xsd:boolean"
+    },
+    "reason": {
+      "@id": "toneperfect:reason",
+      "@type": "xsd:string"
+    },
+    "locale": {
+      "@id": "toneperfect:locale",
+      "@type": "xsd:string"
+    },
+    "task": {
+      "@id": "toneperfect:task",
+      "@type": "xsd:string"
+    },
+    "model_version": {
+      "@id": "toneperfect:model_version",
+      "@type": "xsd:string"
+    },
+    "scores": {
+      "@id": "toneperfect:scores",
+      "@type": "@id"
+    },
+    "warnings": {
+      "@id": "toneperfect:warnings",
+      "@container": "@list"
+    },
+    "words": {
+      "@id": "toneperfect:words",
+      "@container": "@list"
+    },
+    "Assessment": "toneperfect:Assessment",
+    "language": {
+      "@id": "toneperfect:language",
+      "@type": "xsd:string"
+    },
+    "status": {
+      "@id": "toneperfect:status",
+      "@type": "xsd:string"
+    },
+    "syllables": {
+      "@id": "toneperfect:syllables",
+      "@container": "@list"
+    },
+    "duration_seconds": {
+      "@id": "toneperfect:duration_seconds",
+      "@type": "xsd:decimal"
+    },
+    "timing_ms": {
+      "@id": "toneperfect:timing_ms",
+      "@type": "xsd:integer"
+    },
+    "timing": {
+      "@id": "toneperfect:timing"
+    },
+    "model": {
+      "@id": "toneperfect:model"
+    },
+    "raw": {
+      "@id": "toneperfect:raw"
+    },
+    "Capabilities": "toneperfect:Capabilities",
+    "languages": {
+      "@id": "toneperfect:languages",
+      "@container": "@list"
+    },
+    "limits": {
+      "@id": "toneperfect:limits"
+    }
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "TonePerfect (Pronunciation Assessment API) API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects TonePerfect (Pronunciation Assessment API)'s own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-08) from openapi/toneperfect-openapi.json.",
+  "dcterms:created": "2026-10-08",
+  "dcterms:source": [
+    "openapi/toneperfect-openapi.json"
+  ]
+}

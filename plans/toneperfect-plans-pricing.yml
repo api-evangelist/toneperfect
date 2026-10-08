@@ -1,0 +1,24 @@
+generated: '2026-10-08'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://api.toneperfect.app/pricing/
+sources:
+- https://api.toneperfect.app/pricing/
+- https://api.toneperfect.app/blog/pronunciation-assessment-api-pricing-compared/
+name: TonePerfect (Pronunciation Assessment API) pricing
+audience: developer-api
+pricing_basis: per-seat
+plans:
+- name: Starter
+  price_text: $10 / month
+  price: 10
+  description: 2,500 credits every month
+- name: Builder
+  price_text: $50 / month
+  price: 50
+  description: 15,000 credits every month
+- name: Scale
+  price_text: $150 / month
+  price: 150
+  description: 50,000 credits every month
+docs: https://api.toneperfect.app/pricing/

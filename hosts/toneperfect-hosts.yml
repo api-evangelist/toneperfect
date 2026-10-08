@@ -1,0 +1,67 @@
+generated: '2026-10-08'
+method: derived
+source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
+generator: derive-hosts.py
+summary:
+  hosts: 3
+  own: 3
+  other_domain: 0
+  platform: 0
+  roles:
+  - other
+  - website
+hosts:
+- host: api.toneperfect.app
+  found_by:
+  - pointer
+  - apis[]
+  - probed
+  - docs-index
+  - spec-found
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - TermsOfService
+  - StatusPage
+  - Security
+  - SDKs
+  - PrivacyPolicy
+  - Pricing
+  - Login
+  - ChangeLog
+  - Blog
+  - GettingStarted
+  - Website
+  - Documentation
+  serves:
+  - api
+  - docs
+  - spec
+  - hosting
+  vendor: netlify
+  registrable_domain: toneperfect.app
+  role: website
+  relation: own
+- host: app.toneperfect.app
+  found_by:
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: toneperfect.app
+  role: other
+  relation: own
+- host: toneperfect.app
+  found_by:
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: toneperfect.app
+  role: other
+  relation: own

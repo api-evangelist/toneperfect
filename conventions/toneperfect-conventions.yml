@@ -1,0 +1,16 @@
+generated: '2026-10-08'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://api.toneperfect.app/quickstart/
+sources:
+- https://api.toneperfect.app/quickstart/
+idempotency:
+  coverage: full
+  header: Idempotency-Key
+  evidence: Repeating a request with the same key and the same audio returns the stored result without charging again.
+pagination: {}
+versioning: Version is encoded in the URL path (e.g., /v1/assess).
+error_envelope: JSON object with an "error" field containing "code" and "message" strings (e.g., result.error.code, result.error.message).
+authentication: Bearer token passed in the Authorization header.
+note: Fields not described in the documentation are set to null or empty lists.
+docs: https://api.toneperfect.app/quickstart/

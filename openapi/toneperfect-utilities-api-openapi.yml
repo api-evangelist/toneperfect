@@ -1,0 +1,333 @@
+openapi: 3.2.0
+info:
+  title: TonePerfect Pronunciation Assessment Utilities API
+  version: 0.1.0
+  summary: 'Score a short recording against its reference text: sentence, word and sound grades, with Mandarin initial, final and tone per syllable.'
+  description: Send a recording (WAV, MP3, M4A, Ogg or WebM, 0.15–30 s, up to 10 MB) and the text it should contain.
+  contact:
+    name: TonePerfect
+    email: nik@toneperfect.app
+    url: https://api.toneperfect.app/
+servers:
+- url: https://api.toneperfect.app
+  description: Production. Requests pass a proxy with a 26-second timeout.
+tags:
+- name: Utilities
+paths:
+  /v1/lint:
+    post:
+      tags:
+      - Utilities
+      operationId: lintReference
+      summary: Check a reference text before recording
+      description: Applies the engine’s reference rules (script, digits, length, Mandarin pinyin parsing and character count) without audio. Free; no API key; 120 requests per minute per IP address. A text that passes can still be refused by a newer engine.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                language:
+                  type: string
+                  enum:
+                  - zh-CN
+                  - en-US
+                  - fr-FR
+                  - es-419
+                  - de-DE
+                  - it-IT
+                  - pt-BR
+                  - ru-RU
+                  - ko-KR
+                  - ja-JP
+                  default: zh-CN
+                pinyin:
+                  type: string
+                task:
+                  type: string
+                  enum:
+                  - general
+                  - connected_speech
+                  - isolated_word
+                  default: general
+      responses:
+        '200':
+          description: Lint result. `ok` is false when at least one issue has severity `error`.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                - language
+                - issues
+                - units
+                properties:
+                  ok:
+                    type: boolean
+                  language:
+                    type: string
+                  units:
+                    type: integer
+                    description: Characters (Mandarin) or words counted.
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                      - code
+                      - message
+                      - severity
+                      properties:
+                        code:
+                          type: string
+                        message:
+                          type: string
+                        field:
+                          type: string
+                          enum:
+                          - text
+                          - pinyin
+                        severity:
+                          type: string
+                          enum:
+                          - error
+                          - warning
+        '415':
+          description: Send JSON.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Body is not an object of string fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/status:
+    get:
+      tags:
+      - Utilities
+      operationId: getStatus
+      summary: Synthetic probe status
+      description: 'Outcome of the gateway’s synthetic engine check: one machine-speech clip scored through the /v1/assess engine path every few minutes, without an account or credits. A pass means a well-formed scored result came back; it does not measure accuracy. Free; no API key.'
+      security: []
+      responses:
+        '200':
+          description: Probe summary. Checks that find the engine busy with customer work are skipped (counted in `last_24h.busy_skipped`); three in a row read as `degraded` with a `reason`.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - status
+                - generated_at
+                - probe
+                - last_check
+                - consecutive_failures
+                - last_24h
+                - last_7d
+                properties:
+                  status:
+                    type: string
+                    enum:
+                    - operational
+                    - degraded
+                    - down
+                    - unknown
+                    - not_monitored
+                  reason:
+                    type:
+                    - string
+                    - 'null'
+                  reason_code:
+                    type:
+                    - string
+                    - 'null'
+                    enum:
+                    - probe_disabled
+                    - consecutive_failures
+                    - engine_saturated
+                    - no_recent_assessment
+                    - recent_failures
+                    - null
+                  consecutive_busy:
+                    type: integer
+                  generated_at:
+                    type: string
+                    format: date-time
+                  probe:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                      interval_seconds:
+                        type:
+                        - integer
+                        - 'null'
+                      what:
+                        type: string
+                      pass_means:
+                        type: string
+                  last_check:
+                    type:
+                    - object
+                    - 'null'
+                    properties:
+                      checked_at:
+                        type: string
+                      ok:
+                        type: boolean
+                      http_status:
+                        type: integer
+                      latency_ms:
+                        type: integer
+                      model_version:
+                        type:
+                        - string
+                        - 'null'
+                      error:
+                        type:
+                        - string
+                        - 'null'
+                  consecutive_failures:
+                    type: integer
+                  last_24h:
+                    $ref: '#/components/schemas/StatusWindow'
+                  last_7d:
+                    $ref: '#/components/schemas/StatusWindow'
+  /v1/terms:
+    get:
+      tags:
+      - Utilities
+      operationId: getTerms
+      summary: Supported commercial terms
+      description: Plans, credits, limits per plan, what happens to credits after a plan ends, and the invoice shapes billing supports, generated from the code that enforces them. Free; no API key.
+      security: []
+      responses:
+        '200':
+          description: Commercial terms (`version` dated).
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+components:
+  schemas:
+    StatusWindow:
+      type: object
+      properties:
+        checks:
+          type: integer
+        ok:
+          type: integer
+        success_rate:
+          type:
+          - number
+          - 'null'
+        p50_latency_ms:
+          type:
+          - integer
+          - 'null'
+        p90_latency_ms:
+          type:
+          - integer
+          - 'null'
+        busy_skipped:
+          type: integer
+          description: last_24h only
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              enum:
+              - invalid_multipart
+              - invalid_api_key
+              - subscription_required
+              - insufficient_credits
+              - payment_balance_due
+              - upload_timeout
+              - idempotency_conflict
+              - request_pending
+              - idempotency_expired
+              - upload_too_large
+              - invalid_idempotency_key
+              - missing_audio
+              - invalid_reference
+              - invalid_task
+              - invalid_test_outcome
+              - invalid_input
+              - unsupported_language
+              - invalid_audio
+              - invalid_assessment
+              - rate_limit
+              - account_busy
+              - free_capacity
+              - gateway_busy
+              - decoder_busy
+              - audio_decoder_unavailable
+              - engine_unavailable
+              - request_interrupted
+              description: Stable machine-readable code. Branch on this, not on the message.
+            message:
+              type: string
+          additionalProperties: true
+        request_id:
+          type: string
+          description: Present on errors raised before an assessment was stored.
+        id:
+          type: string
+          description: Present on finalized failures (stored under the Idempotency-Key).
+        billing:
+          $ref: '#/components/schemas/Billing'
+    Billing:
+      type: object
+      required:
+      - credits
+      - balance_credits
+      properties:
+        credits:
+          type: integer
+          minimum: 0
+          description: Credits charged by this request (0 when failed or unassessable).
+        balance_credits:
+          type: integer
+          description: Remaining plan balance.
+        free_credits:
+          type: integer
+          description: Remaining free trial credits (every account starts with 50).
+        source:
+          type: string
+          enum:
+          - free
+          - plan
+          description: Which balance paid for this request. Free credits are spent first.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Secret API key (`tp_live_…`) from the dashboard. Keep it on your server. A test key (`tp_test_…`) returns fixed example results and is safe to publish.
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Alternative to the Authorization header.
+externalDocs:
+  description: API reference
+  url: https://api.toneperfect.app/docs

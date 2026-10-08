@@ -1,0 +1,69 @@
+generated: '2026-10-08'
+method: derived
+generator: derive-vocabulary.py
+source: openapi/toneperfect-openapi.json
+vocabulary:
+  name: TonePerfect (Pronunciation Assessment API) Domain Vocabulary
+  description: 'Terms declared by TonePerfect (Pronunciation Assessment API)''s own API contract: its resource groups, objects and enumerations,
+    with the contract''s definitions. Derived, not authored.'
+  version: '2026-10-08'
+  terms:
+  - term: Error
+    definition: 'Object declared by the contract with fields: error, request_id, id, billing.'
+    tags:
+    - Object
+    source: openapi/toneperfect-openapi.json#/components/schemas/Error
+  - term: StatusWindow
+    definition: 'Object declared by the contract with fields: checks, ok, success_rate, p50_latency_ms, p90_latency_ms, busy_skipped.'
+    tags:
+    - Object
+    source: openapi/toneperfect-openapi.json#/components/schemas/StatusWindow
+  - term: Billing
+    definition: 'Object declared by the contract with fields: credits, balance_credits, free_credits, source.'
+    tags:
+    - Object
+    source: openapi/toneperfect-openapi.json#/components/schemas/Billing
+  - term: Scores
+    definition: 0–100 display grades. Unsupported dimensions are null; null is never a zero score. `integrity` is completeness.
+    tags:
+    - Object
+    source: openapi/toneperfect-openapi.json#/components/schemas/Scores
+  - term: Phone
+    definition: One sound. Mandarin rows describe a syllable component (`dimension` initial, final or tone; tones are integers 1–5). Other languages
+      describe a phoneme with timing and an alignment operation.
+    tags:
+    - Object
+    source: openapi/toneperfect-openapi.json#/components/schemas/Phone
+  - term: Word
+    definition: 'Object declared by the contract with fields: word, pinyin, expected_ipa, score, start_ms, end_ms, decision, omission_suspected,
+      phones.'
+    tags:
+    - Object
+    source: openapi/toneperfect-openapi.json#/components/schemas/Word
+  - term: Component
+    definition: A Mandarin syllable component (initial, final or tone).
+    tags:
+    - Object
+    source: openapi/toneperfect-openapi.json#/components/schemas/Component
+  - term: Syllable
+    definition: 'Object declared by the contract with fields: index, expected, span_ms, score, components.'
+    tags:
+    - Object
+    source: openapi/toneperfect-openapi.json#/components/schemas/Syllable
+  - term: CompactAssessment
+    definition: 'Object declared by the contract with fields: schema, id, assessable, reason, locale, task, model_version, scores, billing, warnings,
+      words.'
+    tags:
+    - Object
+    source: openapi/toneperfect-openapi.json#/components/schemas/CompactAssessment
+  - term: Assessment
+    definition: 'Object declared by the contract with fields: id, language, locale, model_version, task, status, assessable, reason, scores, words,
+      syllables, heard. (7 more)'
+    tags:
+    - Object
+    source: openapi/toneperfect-openapi.json#/components/schemas/Assessment
+  - term: Capabilities
+    definition: 'Object declared by the contract with fields: model_version, languages, limits.'
+    tags:
+    - Object
+    source: openapi/toneperfect-openapi.json#/components/schemas/Capabilities

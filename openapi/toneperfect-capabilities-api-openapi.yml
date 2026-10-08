@@ -1,0 +1,197 @@
+openapi: 3.2.0
+info:
+  title: TonePerfect Pronunciation Assessment Capabilities API
+  version: 0.1.0
+  summary: 'Score a short recording against its reference text: sentence, word and sound grades, with Mandarin initial, final and tone per syllable.'
+  description: Send a recording (WAV, MP3, M4A, Ogg or WebM, 0.15–30 s, up to 10 MB) and the text it should contain.
+  contact:
+    name: TonePerfect
+    email: nik@toneperfect.app
+    url: https://api.toneperfect.app/
+servers:
+- url: https://api.toneperfect.app
+  description: Production. Requests pass a proxy with a 26-second timeout.
+tags:
+- name: Capabilities
+paths:
+  /v1/capabilities:
+    get:
+      tags:
+      - Capabilities
+      operationId: getCapabilities
+      summary: Installed languages, dimensions and limits
+      description: No API key required.
+      security: []
+      responses:
+        '200':
+          description: Current capabilities.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capabilities'
+        '503':
+          description: The pronunciation engine is unreachable (`engine_unavailable`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Capabilities:
+      type: object
+      properties:
+        model_version:
+          type: string
+        languages:
+          type: array
+          items:
+            type: object
+            required:
+            - locale
+            - available
+            properties:
+              locale:
+                type: string
+              name:
+                type: string
+              language:
+                type: string
+              available:
+                type: boolean
+              status:
+                type: string
+                examples:
+                - experimental
+              model_version:
+                type: string
+              dimensions:
+                type: array
+                items:
+                  type: string
+              tasks:
+                type: array
+                items:
+                  type: string
+              correction_level:
+                type: string
+              limitations:
+                type: array
+                items:
+                  type: string
+              unsupported_dimensions:
+                type: array
+                items:
+                  type: string
+              notes:
+                type:
+                - string
+                - array
+              max_words:
+                type: integer
+              max_duration_seconds:
+                type: number
+            additionalProperties: true
+        limits:
+          type: object
+          properties:
+            max_audio_seconds:
+              type: integer
+              examples:
+              - 30
+            max_upload_bytes:
+              type: integer
+              examples:
+              - 10485760
+            concurrent_requests_per_account:
+              type: integer
+              examples:
+              - 2
+      additionalProperties: true
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              enum:
+              - invalid_multipart
+              - invalid_api_key
+              - subscription_required
+              - insufficient_credits
+              - payment_balance_due
+              - upload_timeout
+              - idempotency_conflict
+              - request_pending
+              - idempotency_expired
+              - upload_too_large
+              - invalid_idempotency_key
+              - missing_audio
+              - invalid_reference
+              - invalid_task
+              - invalid_test_outcome
+              - invalid_input
+              - unsupported_language
+              - invalid_audio
+              - invalid_assessment
+              - rate_limit
+              - account_busy
+              - free_capacity
+              - gateway_busy
+              - decoder_busy
+              - audio_decoder_unavailable
+              - engine_unavailable
+              - request_interrupted
+              description: Stable machine-readable code. Branch on this, not on the message.
+            message:
+              type: string
+          additionalProperties: true
+        request_id:
+          type: string
+          description: Present on errors raised before an assessment was stored.
+        id:
+          type: string
+          description: Present on finalized failures (stored under the Idempotency-Key).
+        billing:
+          $ref: '#/components/schemas/Billing'
+    Billing:
+      type: object
+      required:
+      - credits
+      - balance_credits
+      properties:
+        credits:
+          type: integer
+          minimum: 0
+          description: Credits charged by this request (0 when failed or unassessable).
+        balance_credits:
+          type: integer
+          description: Remaining plan balance.
+        free_credits:
+          type: integer
+          description: Remaining free trial credits (every account starts with 50).
+        source:
+          type: string
+          enum:
+          - free
+          - plan
+          description: Which balance paid for this request. Free credits are spent first.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Secret API key (`tp_live_…`) from the dashboard. Keep it on your server. A test key (`tp_test_…`) returns fixed example results and is safe to publish.
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Alternative to the Authorization header.
+externalDocs:
+  description: API reference
+  url: https://api.toneperfect.app/docs

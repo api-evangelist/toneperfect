@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/toneperfect/main/json-schema/toneperfect-capabilities-schema.json",
+  "title": "Capabilities",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/toneperfect-openapi.json#/components/schemas/Capabilities",
+  "type": "object",
+  "properties": {
+    "model_version": {
+      "type": "string"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "locale",
+          "available"
+        ],
+        "properties": {
+          "locale": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string"
+          },
+          "model_version": {
+            "type": "string"
+          },
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "correction_level": {
+            "type": "string"
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "unsupported_dimensions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notes": {
+            "type": [
+              "string",
+              "array"
+            ]
+          },
+          "max_words": {
+            "type": "integer"
+          },
+          "max_duration_seconds": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "max_audio_seconds": {
+          "type": "integer"
+        },
+        "max_upload_bytes": {
+          "type": "integer"
+        },
+        "concurrent_requests_per_account": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

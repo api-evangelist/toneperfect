@@ -1,0 +1,970 @@
+openapi: 3.2.0
+info:
+  title: TonePerfect Pronunciation Assessment API
+  version: 0.1.0
+  summary: 'Score a short recording against its reference text: sentence, word and sound grades, with Mandarin initial, final and tone per syllable.'
+  description: Send a recording (WAV, MP3, M4A, Ogg or WebM, 0.15–30 s, up to 10 MB) and the text it should contain.
+  contact:
+    name: TonePerfect
+    email: nik@toneperfect.app
+    url: https://api.toneperfect.app/
+servers:
+- url: https://api.toneperfect.app
+  description: Production. Requests pass a proxy with a 26-second timeout.
+tags:
+- name: Assessment
+paths:
+  /v1/assess:
+    post:
+      tags:
+      - Assessment
+      operationId: assessPronunciation
+      summary: Assess a short recording
+      description: 'Multipart upload of the recording plus its reference. Provide `text`, or (Mandarin only) `pinyin`, or both with one pinyin syllable per character. 60 requests per minute per account; assessments in progress at once per plan are listed in `GET /v1/terms` (`limits.concurrent_requests_by_plan`). A `tp_test_` key returns a fixed example result (`test: true`), never scores audio and never spends credits.'
+      security:
+      - bearerAuth: []
+      - apiKeyHeader: []
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        description: Unique per recording attempt. Retry with the same key and identical fields when the outcome is unknown; use a new key for a new attempt. Results are kept for 24 hours.
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9_.:-]{8,128}$
+          examples:
+          - lesson-42-attempt-1
+      - name: TonePerfect-Response
+        in: header
+        required: false
+        schema:
+          type: string
+          enum:
+          - compact
+        description: Request the versioned toneperfect.compact.v1 shape; default engine-oriented shape remains available.
+      - name: TonePerfect-Test-Outcome
+        in: header
+        required: false
+        schema:
+          type: string
+          enum:
+          - success
+          - unassessable
+          - invalid_assessment
+          - engine_unavailable
+          - subscription_required
+          - insufficient_credits
+          - account_busy
+          - rate_limit
+        description: 'Test keys (`tp_test_…`) only: the outcome the fixed example response rehearses. Ignored by live keys.'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - audio
+              properties:
+                audio:
+                  type: string
+                  format: binary
+                  description: 'The recording: WAV, MP3, M4A, Ogg or WebM, 0.15–30 seconds, at most 10 MB.'
+                text:
+                  type: string
+                  maxLength: 500
+                  description: 'The expected words. Required unless `pinyin` is given. Mandarin: up to 100 characters, numbers and foreign words written in Chinese. Other languages: up to 40 words in the language’s own script (Latin; Cyrillic for ru-RU; Hangul with normal spacing for ko-KR; kana and/or kanji for ja-JP, split into bunsetsu-like units, kanji read with a dictionary), numbers written as words.'
+                  examples:
+                  - 你好
+                language:
+                  type: string
+                  enum:
+                  - zh-CN
+                  - en-US
+                  - fr-FR
+                  - es-419
+                  - de-DE
+                  - it-IT
+                  - pt-BR
+                  - ru-RU
+                  - ko-KR
+                  - ja-JP
+                  default: zh-CN
+                  description: Locale. Every pack is labelled experimental; ru-RU, ko-KR and ja-JP were added in October 2026. See GET /v1/capabilities for live availability.
+                task:
+                  type: string
+                  enum:
+                  - general
+                  - connected_speech
+                  - isolated_word
+                  default: general
+                  description: Practice context. Mandarin component correction decisions from the human-judgment model apply with `connected_speech`.
+                pinyin:
+                  type: string
+                  maxLength: 1000
+                  description: 'Mandarin only: numbered-tone pinyin, space-separated, one syllable per character (up to 100), e.g. `ni3 hao3`; `v` for ü; 5 or 0 for the neutral tone.'
+                  examples:
+                  - ni3 hao3
+            encoding:
+              audio:
+                contentType: audio/wav, audio/mpeg, audio/mp4, audio/ogg, audio/webm, application/octet-stream
+      responses:
+        '200':
+          description: 'Assessment completed. Check `assessable`: when it is false the recording could not be assessed (`reason` says why) and nothing was charged.'
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/X-Request-Id'
+            Idempotent-Replayed:
+              description: '`true` when the stored result for this Idempotency-Key was returned.'
+              schema:
+                type: string
+                enum:
+                - 'true'
+            X-TonePerfect-Test:
+              description: '`true` on a fixed example response from a test key.'
+              schema:
+                type: string
+                enum:
+                - 'true'
+            X-TonePerfect-Credits-Charged:
+              description: Credits this request used.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/Assessment'
+                - $ref: '#/components/schemas/CompactAssessment'
+              examples:
+                compact:
+                  summary: Documented compact shape example; not an accuracy benchmark
+                  value:
+                    schema: toneperfect.compact.v1
+                    id: req_example
+                    assessable: true
+                    reason: null
+                    locale: zh-CN
+                    task: general
+                    model_version: mandarin-human-v2-85741cdf3967-fbf73d85ee88
+                    scores:
+                      overall: 99.6
+                      pronunciation: 97.8
+                      initial: 98.2
+                      final: 97.3
+                      tone: 98
+                      fluency: null
+                      rhythm: null
+                      completeness: null
+                    words:
+                    - text: 你
+                      pinyin: ni3
+                      score: 99.3
+                      start_ms: 0
+                      end_ms: 155
+                      decision: null
+                      units:
+                      - dimension: initial
+                        expected: n
+                        heard: n
+                        score: 96.6
+                        decision: no_correction
+                      - dimension: final
+                        expected: i
+                        heard: i
+                        score: 96.1
+                        decision: no_correction
+                      - dimension: tone
+                        expected: '3'
+                        heard: '2'
+                        score: 99.7
+                        decision: no_correction
+                    - text: 好
+                      pinyin: hao3
+                      score: 99.5
+                      start_ms: 155
+                      end_ms: 424
+                      decision: null
+                      units:
+                      - dimension: initial
+                        expected: h
+                        heard: h
+                        score: 99.8
+                        decision: no_correction
+                      - dimension: final
+                        expected: ao
+                        heard: ao
+                        score: 98.5
+                        decision: no_correction
+                      - dimension: tone
+                        expected: '3'
+                        heard: '3'
+                        score: 96.3
+                        decision: no_correction
+                    warnings: []
+                    billing:
+                      credits: 1
+                      balance_credits: 2499
+                mandarin:
+                  summary: Real response for 你好 (trimmed to documented fields)
+                  value:
+                    id: req_example
+                    language: zh
+                    locale: zh-CN
+                    model_version: mandarin-human-v2-85741cdf3967-fbf73d85ee88
+                    task: general
+                    status: completed
+                    assessable: true
+                    reason: null
+                    scores:
+                      overall: 99.6
+                      pronunciation: 97.8
+                      initial: 98.2
+                      final: 97.3
+                      tone: 98
+                      fluency: null
+                      rhythm: null
+                      integrity: null
+                    words:
+                    - word: 你
+                      pinyin: ni3
+                      score: 99.3
+                      start_ms: 0
+                      end_ms: 155
+                      phones:
+                      - dimension: initial
+                        expected: n
+                        heard: n
+                        score: 96.6
+                        decision: no_correction
+                        flagged: false
+                      - dimension: final
+                        expected: i
+                        heard: i
+                        score: 96.1
+                        decision: no_correction
+                        flagged: false
+                      - dimension: tone
+                        expected: 3
+                        heard: 2
+                        score: 99.7
+                        decision: no_correction
+                        flagged: false
+                    - word: 好
+                      pinyin: hao3
+                      score: 99.5
+                      start_ms: 155
+                      end_ms: 424
+                      phones:
+                      - dimension: initial
+                        expected: h
+                        heard: h
+                        score: 99.8
+                        decision: no_correction
+                        flagged: false
+                      - dimension: final
+                        expected: ao
+                        heard: ao
+                        score: 98.5
+                        decision: no_correction
+                        flagged: false
+                      - dimension: tone
+                        expected: 3
+                        heard: 3
+                        score: 96.3
+                        decision: no_correction
+                        flagged: false
+                    syllables:
+                    - index: 0
+                      expected:
+                        pinyin: ni3
+                        initial: n
+                        final: i
+                        tone: 3
+                      span_ms:
+                      - 0
+                      - 155
+                      score: 99.3
+                      components:
+                        initial:
+                          expected: n
+                          heard: n
+                          agrees_with_prompt: true
+                          score: 96.6
+                          confidence: high
+                          decision: no_correction
+                          advice: null
+                        final:
+                          expected: i
+                          heard: i
+                          agrees_with_prompt: true
+                          score: 96.1
+                          confidence: high
+                          decision: no_correction
+                          advice: null
+                        tone:
+                          expected: 3
+                          heard: 2
+                          agrees_with_prompt: false
+                          score: 99.7
+                          confidence: high
+                          decision: no_correction
+                          advice: null
+                    - index: 1
+                      expected:
+                        pinyin: hao3
+                        initial: h
+                        final: ao
+                        tone: 3
+                      span_ms:
+                      - 155
+                      - 424
+                      score: 99.5
+                      components:
+                        initial:
+                          expected: h
+                          heard: h
+                          agrees_with_prompt: true
+                          score: 99.8
+                          confidence: high
+                          decision: no_correction
+                          advice: null
+                        final:
+                          expected: ao
+                          heard: ao
+                          agrees_with_prompt: true
+                          score: 98.5
+                          confidence: high
+                          decision: no_correction
+                          advice: null
+                        tone:
+                          expected: 3
+                          heard: 3
+                          agrees_with_prompt: true
+                          score: 96.3
+                          confidence: high
+                          decision: no_correction
+                          advice: null
+                    heard:
+                      syllables:
+                      - initial: n
+                        final: i
+                        tone: 2
+                      - initial: h
+                        final: ao
+                        tone: 3
+                    duration_seconds: 0.54
+                    billing:
+                      credits: 1
+                      balance_credits: 2499
+        '400':
+          description: 'Bad request. Possible `error.code` values:
+
+            - `invalid_multipart`: The body is not readable multipart/form-data. Send multipart fields audio, text and language; let your HTTP client set the boundary.'
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: 'Unauthorized. Possible `error.code` values:
+
+            - `invalid_api_key`: The key is missing, unknown or revoked. Send Authorization: Bearer YOUR_KEY (or X-Api-Key). Create a key in the dashboard.'
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '402':
+          description: 'Payment required. Possible `error.code` values:
+
+            - `subscription_required`: Free credits are used up and there is no active paid monthly plan. Start or renew a plan in the dashboard. Existing credits are kept.
+
+            - `insufficient_credits`: The plan balance does not cover this recording (1 credit per started 15 s). Free credits never cause this: a clip longer than the free credits left uses what is left. Buy an extra credit pack or wait for the monthly renewal.
+
+            - `payment_balance_due`: A refunded or disputed purchase left a balance to settle. The next purchase settles it first.'
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '408':
+          description: 'Upload timeout. Possible `error.code` values:
+
+            - `upload_timeout`: The upload took longer than 30 seconds. Nothing was charged. Retry with the same key.'
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: 'Idempotency conflict. Possible `error.code` values:
+
+            - `idempotency_conflict`: This Idempotency-Key was used with different audio or fields. Use a new key for a new attempt.
+
+            - `request_pending`: The assessment for this key is still running. Retry the same key shortly.
+
+            - `idempotency_expired`: The stored result for this key is older than 24 hours. Use a new key. An expired key never charges again.'
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: 'Payload too large. Possible `error.code` values:
+
+            - `upload_too_large`: The upload is over 10 MB. Send a shorter or compressed recording.'
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: 'Unprocessable request. Possible `error.code` values:
+
+            - `invalid_idempotency_key`: The Idempotency-Key header is missing or malformed. Send 8–128 letters, digits, dots, dashes, underscores or colons.
+
+            - `missing_audio`: No file in the audio field. Attach the recording as a file part named audio.
+
+            - `invalid_reference`: No text or pinyin, or a field is too long. Send text (up to 500 characters) or Mandarin pinyin (up to 1,000 characters).
+
+            - `invalid_task`: task is not one of the accepted values. Use general, connected_speech or isolated_word.
+
+            - `invalid_test_outcome`: TonePerfect-Test-Outcome names an outcome a test key cannot rehearse. Use success, unassessable, invalid_assessment, engine_unavailable, subscription_required, insufficient_credits, account_busy or rate_limit, or drop the header.
+
+            - `invalid_input`: text, pinyin or language is not a string. Send them as plain form fields.
+
+            - `unsupported_language`: The locale is not available. Choose an available locale from GET /v1/capabilities.
+
+            - `invalid_audio`: The file could not be decoded, or is shorter than 0.15 s or longer than 30 s. Send WAV, MP3, M4A, Ogg or WebM between 0.15 and 30 seconds.
+
+            - `invalid_assessment` (finalized: carries `id` and `billing`; retry with a new key): The engine rejected this reference and recording, for example digits or Latin letters in a Mandarin reference, pinyin that does not match the characters, or text in the wrong script for the locale. Check the reference text against the language. Not charged; a new attempt needs a new key.'
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/X-Request-Id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: 'Too many requests. Possible `error.code` values:
+
+            - `rate_limit`: More than 60 assessment requests in a minute for this account. Slow down and retry the same key after a short delay.
+
+            - `account_busy`: The account already has its concurrent-assessment limit running (2 by default; see limits in GET /v1/capabilities). Wait for one to finish, then retry the same key.
+
+            - `free_capacity`: Free credits have reached today’s shared daily limit. Nothing was charged. Retry tomorrow with a new Idempotency-Key, or start a plan to use plan credits now.'
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/X-Request-Id'
+            Retry-After:
+              description: Seconds to wait (sent with `account_busy` and `rate_limit`).
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: 'Service unavailable. Possible `error.code` values:
+
+            - `gateway_busy`: The upload gateway is at capacity. Nothing was charged. Retry the same key after the Retry-After delay.
+
+            - `decoder_busy`: The audio decoder is at capacity. Retry the same key shortly.
+
+            - `audio_decoder_unavailable`: Audio decoding is temporarily unavailable. Retry the same key shortly.
+
+            - `engine_unavailable` (finalized: carries `id` and `billing`; retry with a new key): The engine could not finish the assessment, or its queue was full (or, from GET /v1/capabilities, is unreachable). If the body has an id and billing, it is finalized and not charged: retry with a new key after a short delay. Otherwise retry the same key.
+
+            - `request_interrupted` (finalized: carries `id` and `billing`; retry with a new key): The request was interrupted before the engine finished. Not charged. Retry with a new key.'
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/X-Request-Id'
+            Retry-After:
+              description: Seconds to wait before retrying (sent with `gateway_busy`).
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Phone:
+      type: object
+      description: One sound. Mandarin rows describe a syllable component (`dimension` initial, final or tone; tones are integers 1–5). Other languages describe a phoneme with timing and an alignment operation.
+      properties:
+        dimension:
+          type: string
+          examples:
+          - tone
+        expected:
+          type:
+          - string
+          - integer
+          - 'null'
+        heard:
+          type:
+          - string
+          - integer
+          - 'null'
+        score:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+        decision:
+          type: string
+          description: 'Correction decision: `review` (strong evidence of an error), `uncertain`, `no_correction`; `unassessable`, `partial` and `legacy_correction` also occur. Treat any other value as no decision.'
+          examples:
+          - no_correction
+        flagged:
+          type: boolean
+        start_ms:
+          type: integer
+        end_ms:
+          type: integer
+        operation:
+          type:
+          - string
+          - 'null'
+          description: Alignment operation (M match, S substitution, …). Non-Mandarin packs.
+        diagnosis_status:
+          type: string
+          description: '`experimental` for non-Mandarin phoneme evidence.'
+      additionalProperties: true
+    Assessment:
+      type: object
+      required:
+      - id
+      - assessable
+      - scores
+      - billing
+      properties:
+        id:
+          type: string
+          description: Request id (`req_…`).
+        language:
+          type: string
+          examples:
+          - zh
+        locale:
+          type: string
+          examples:
+          - zh-CN
+        model_version:
+          type: string
+          description: The model that scored this request.
+        task:
+          type: string
+        status:
+          type: string
+          description: '`completed`, `unassessable` or `partial`.'
+        assessable:
+          type: boolean
+        reason:
+          type:
+          - string
+          - 'null'
+          description: Why the recording was not assessable, e.g. `no_speech / no_audio`, `too_short`, `different_content`, `language_model_not_installed`, `unsupported_phonetic_symbols`, `no_calibrated_units`.
+        scores:
+          $ref: '#/components/schemas/Scores'
+        words:
+          type: array
+          items:
+            $ref: '#/components/schemas/Word'
+        syllables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Syllable'
+          description: Mandarin only.
+        heard:
+          type: object
+          description: 'What the engine estimates was said: `syllables[]` (Mandarin) or `phonetic_transcription`.'
+          additionalProperties: true
+        duration_seconds:
+          type:
+          - number
+          - 'null'
+        timing_ms:
+          type: integer
+          description: Engine processing time.
+        timing:
+          type:
+          - object
+          - 'null'
+          description: Mandarin pause and speaking-rate measurements.
+          additionalProperties: true
+        model:
+          type: object
+          description: 'Model metadata: id, calibration notes, limitations.'
+          additionalProperties: true
+        warnings:
+          type: array
+          items:
+            type: string
+        billing:
+          $ref: '#/components/schemas/Billing'
+        raw:
+          description: Engine diagnostics. Not a stable contract.
+      additionalProperties: true
+    Syllable:
+      type: object
+      properties:
+        index:
+          type: integer
+        expected:
+          type: object
+          properties:
+            pinyin:
+              type: string
+            initial:
+              type:
+              - string
+              - 'null'
+            final:
+              type: string
+            tone:
+              type: integer
+        span_ms:
+          type: array
+          items:
+            type:
+            - integer
+            - 'null'
+          minItems: 2
+          maxItems: 2
+        score:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+        components:
+          type: object
+          properties:
+            initial:
+              $ref: '#/components/schemas/Component'
+            final:
+              $ref: '#/components/schemas/Component'
+            tone:
+              $ref: '#/components/schemas/Component'
+      additionalProperties: true
+    Billing:
+      type: object
+      required:
+      - credits
+      - balance_credits
+      properties:
+        credits:
+          type: integer
+          minimum: 0
+          description: Credits charged by this request (0 when failed or unassessable).
+        balance_credits:
+          type: integer
+          description: Remaining plan balance.
+        free_credits:
+          type: integer
+          description: Remaining free trial credits (every account starts with 50).
+        source:
+          type: string
+          enum:
+          - free
+          - plan
+          description: Which balance paid for this request. Free credits are spent first.
+    CompactAssessment:
+      type: object
+      required:
+      - schema
+      - id
+      - assessable
+      - scores
+      - words
+      - billing
+      properties:
+        schema:
+          const: toneperfect.compact.v1
+        id:
+          type: string
+        assessable:
+          type: boolean
+        reason:
+          type:
+          - string
+          - 'null'
+        locale:
+          type: string
+        task:
+          type: string
+        model_version:
+          type:
+          - string
+          - 'null'
+        scores:
+          $ref: '#/components/schemas/Scores'
+        billing:
+          $ref: '#/components/schemas/Billing'
+        warnings:
+          type: array
+          items:
+            type: string
+        words:
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+              score:
+                type:
+                - number
+                - 'null'
+              units:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    dimension:
+                      type: string
+                    expected:
+                      type:
+                      - string
+                      - 'null'
+                    heard:
+                      type:
+                      - string
+                      - 'null'
+                    score:
+                      type:
+                      - number
+                      - 'null'
+                    decision:
+                      type:
+                      - string
+                      - 'null'
+    Scores:
+      type: object
+      description: 0–100 display grades. Unsupported dimensions are null; null is never a zero score. `integrity` is completeness.
+      properties:
+        overall:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+        pronunciation:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+        initial:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+        final:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+        tone:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+        integrity:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+        fluency:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+        rhythm:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+      additionalProperties:
+        type:
+        - number
+        - 'null'
+        minimum: 0
+        maximum: 100
+    Word:
+      type: object
+      properties:
+        word:
+          type: string
+          description: The word (a character in Mandarin).
+        pinyin:
+          type: string
+          description: 'Mandarin: numbered pinyin of the syllable.'
+        expected_ipa:
+          type: string
+          description: 'Other languages: expected pronunciation.'
+        score:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+        start_ms:
+          type:
+          - integer
+          - 'null'
+        end_ms:
+          type:
+          - integer
+          - 'null'
+        decision:
+          type: string
+          description: 'Other languages: the word-level correction decision. Correction decision: `review` (strong evidence of an error), `uncertain`, `no_correction`; `unassessable`, `partial` and `legacy_correction` also occur. Treat any other value as no decision.'
+          examples:
+          - no_correction
+        omission_suspected:
+          type: boolean
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/Phone'
+      additionalProperties: true
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              enum:
+              - invalid_multipart
+              - invalid_api_key
+              - subscription_required
+              - insufficient_credits
+              - payment_balance_due
+              - upload_timeout
+              - idempotency_conflict
+              - request_pending
+              - idempotency_expired
+              - upload_too_large
+              - invalid_idempotency_key
+              - missing_audio
+              - invalid_reference
+              - invalid_task
+              - invalid_test_outcome
+              - invalid_input
+              - unsupported_language
+              - invalid_audio
+              - invalid_assessment
+              - rate_limit
+              - account_busy
+              - free_capacity
+              - gateway_busy
+              - decoder_busy
+              - audio_decoder_unavailable
+              - engine_unavailable
+              - request_interrupted
+              description: Stable machine-readable code. Branch on this, not on the message.
+            message:
+              type: string
+          additionalProperties: true
+        request_id:
+          type: string
+          description: Present on errors raised before an assessment was stored.
+        id:
+          type: string
+          description: Present on finalized failures (stored under the Idempotency-Key).
+        billing:
+          $ref: '#/components/schemas/Billing'
+    Component:
+      type: object
+      description: A Mandarin syllable component (initial, final or tone).
+      properties:
+        expected:
+          type:
+          - string
+          - integer
+          - 'null'
+        heard:
+          type:
+          - string
+          - integer
+          - 'null'
+        agrees_with_prompt:
+          type: boolean
+        score:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          maximum: 100
+        confidence:
+          type: string
+        alternatives:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type:
+                - string
+                - integer
+              probability:
+                type: number
+          description: Ranked candidate labels with probabilities.
+        decision:
+          type: string
+          description: 'Correction decision: `review` (strong evidence of an error), `uncertain`, `no_correction`; `unassessable`, `partial` and `legacy_correction` also occur. Treat any other value as no decision.'
+          examples:
+          - no_correction
+        advice:
+          type:
+          - string
+          - 'null'
+      additionalProperties: true
+  headers:
+    X-Request-Id:
+      description: Request identifier (`req_…`).
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Secret API key (`tp_live_…`) from the dashboard. Keep it on your server. A test key (`tp_test_…`) returns fixed example results and is safe to publish.
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Alternative to the Authorization header.
+externalDocs:
+  description: API reference
+  url: https://api.toneperfect.app/docs

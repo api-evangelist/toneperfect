@@ -1,0 +1,448 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/toneperfect/main/json-schema/toneperfect-assessment-schema.json",
+  "title": "Assessment",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/toneperfect-openapi.json#/components/schemas/Assessment",
+  "type": "object",
+  "required": [
+    "id",
+    "assessable",
+    "scores",
+    "billing"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Request id (`req_…`)."
+    },
+    "language": {
+      "type": "string"
+    },
+    "locale": {
+      "type": "string"
+    },
+    "model_version": {
+      "type": "string",
+      "description": "The model that scored this request."
+    },
+    "task": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "description": "`completed`, `unassessable` or `partial`."
+    },
+    "assessable": {
+      "type": "boolean"
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Why the recording was not assessable, e.g. `no_speech / no_audio`, `too_short`, `different_content`, `language_model_not_installed`, `unsupported_phonetic_symbols`, `no_calibrated_units`."
+    },
+    "scores": {
+      "$ref": "#/$defs/Scores"
+    },
+    "words": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Word"
+      }
+    },
+    "syllables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Syllable"
+      },
+      "description": "Mandarin only."
+    },
+    "heard": {
+      "type": "object",
+      "description": "What the engine estimates was said: `syllables[]` (Mandarin) or `phonetic_transcription`.",
+      "additionalProperties": true
+    },
+    "duration_seconds": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "timing_ms": {
+      "type": "integer",
+      "description": "Engine processing time."
+    },
+    "timing": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Mandarin pause and speaking-rate measurements.",
+      "additionalProperties": true
+    },
+    "model": {
+      "type": "object",
+      "description": "Model metadata: id, calibration notes, limitations.",
+      "additionalProperties": true
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "billing": {
+      "$ref": "#/$defs/Billing"
+    },
+    "raw": {
+      "description": "Engine diagnostics. Not a stable contract."
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "Billing": {
+      "type": "object",
+      "required": [
+        "credits",
+        "balance_credits"
+      ],
+      "properties": {
+        "credits": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Credits charged by this request (0 when failed or unassessable)."
+        },
+        "balance_credits": {
+          "type": "integer",
+          "description": "Remaining plan balance."
+        },
+        "free_credits": {
+          "type": "integer",
+          "description": "Remaining free trial credits (every account starts with 50)."
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "free",
+            "plan"
+          ],
+          "description": "Which balance paid for this request. Free credits are spent first."
+        }
+      }
+    },
+    "Component": {
+      "type": "object",
+      "description": "A Mandarin syllable component (initial, final or tone).",
+      "properties": {
+        "expected": {
+          "type": [
+            "string",
+            "integer",
+            "null"
+          ]
+        },
+        "heard": {
+          "type": [
+            "string",
+            "integer",
+            "null"
+          ]
+        },
+        "agrees_with_prompt": {
+          "type": "boolean"
+        },
+        "score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "confidence": {
+          "type": "string"
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": [
+                  "string",
+                  "integer"
+                ]
+              },
+              "probability": {
+                "type": "number"
+              }
+            }
+          },
+          "description": "Ranked candidate labels with probabilities."
+        },
+        "decision": {
+          "type": "string",
+          "description": "Correction decision: `review` (strong evidence of an error), `uncertain`, `no_correction`; `unassessable`, `partial` and `legacy_correction` also occur. Treat any other value as no decision."
+        },
+        "advice": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "Phone": {
+      "type": "object",
+      "description": "One sound. Mandarin rows describe a syllable component (`dimension` initial, final or tone; tones are integers 1–5). Other languages describe a phoneme with timing and an alignment operation.",
+      "properties": {
+        "dimension": {
+          "type": "string"
+        },
+        "expected": {
+          "type": [
+            "string",
+            "integer",
+            "null"
+          ]
+        },
+        "heard": {
+          "type": [
+            "string",
+            "integer",
+            "null"
+          ]
+        },
+        "score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "decision": {
+          "type": "string",
+          "description": "Correction decision: `review` (strong evidence of an error), `uncertain`, `no_correction`; `unassessable`, `partial` and `legacy_correction` also occur. Treat any other value as no decision."
+        },
+        "flagged": {
+          "type": "boolean"
+        },
+        "start_ms": {
+          "type": "integer"
+        },
+        "end_ms": {
+          "type": "integer"
+        },
+        "operation": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Alignment operation (M match, S substitution, …). Non-Mandarin packs."
+        },
+        "diagnosis_status": {
+          "type": "string",
+          "description": "`experimental` for non-Mandarin phoneme evidence."
+        }
+      },
+      "additionalProperties": true
+    },
+    "Scores": {
+      "type": "object",
+      "description": "0–100 display grades. Unsupported dimensions are null; null is never a zero score. `integrity` is completeness.",
+      "properties": {
+        "overall": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "pronunciation": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "initial": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "final": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "tone": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "integrity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "fluency": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "rhythm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "additionalProperties": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "Syllable": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "expected": {
+          "type": "object",
+          "properties": {
+            "pinyin": {
+              "type": "string"
+            },
+            "initial": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "final": {
+              "type": "string"
+            },
+            "tone": {
+              "type": "integer"
+            }
+          }
+        },
+        "span_ms": {
+          "type": "array",
+          "items": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "components": {
+          "type": "object",
+          "properties": {
+            "initial": {
+              "$ref": "#/$defs/Component"
+            },
+            "final": {
+              "$ref": "#/$defs/Component"
+            },
+            "tone": {
+              "$ref": "#/$defs/Component"
+            }
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "Word": {
+      "type": "object",
+      "properties": {
+        "word": {
+          "type": "string",
+          "description": "The word (a character in Mandarin)."
+        },
+        "pinyin": {
+          "type": "string",
+          "description": "Mandarin: numbered pinyin of the syllable."
+        },
+        "expected_ipa": {
+          "type": "string",
+          "description": "Other languages: expected pronunciation."
+        },
+        "score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "start_ms": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "end_ms": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "decision": {
+          "type": "string",
+          "description": "Other languages: the word-level correction decision. Correction decision: `review` (strong evidence of an error), `uncertain`, `no_correction`; `unassessable`, `partial` and `legacy_correction` also occur. Treat any other value as no decision."
+        },
+        "omission_suspected": {
+          "type": "boolean"
+        },
+        "phones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Phone"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

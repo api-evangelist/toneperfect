@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/toneperfect/main/json-schema/toneperfect-compact-assessment-schema.json",
+  "title": "CompactAssessment",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/toneperfect-openapi.json#/components/schemas/CompactAssessment",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "assessable",
+    "scores",
+    "words",
+    "billing"
+  ],
+  "properties": {
+    "schema": {
+      "const": "toneperfect.compact.v1"
+    },
+    "id": {
+      "type": "string"
+    },
+    "assessable": {
+      "type": "boolean"
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "locale": {
+      "type": "string"
+    },
+    "task": {
+      "type": "string"
+    },
+    "model_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "scores": {
+      "$ref": "#/$defs/Scores"
+    },
+    "billing": {
+      "$ref": "#/$defs/Billing"
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "words": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "score": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "dimension": {
+                  "type": "string"
+                },
+                "expected": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "heard": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "score": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "decision": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "Billing": {
+      "type": "object",
+      "required": [
+        "credits",
+        "balance_credits"
+      ],
+      "properties": {
+        "credits": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Credits charged by this request (0 when failed or unassessable)."
+        },
+        "balance_credits": {
+          "type": "integer",
+          "description": "Remaining plan balance."
+        },
+        "free_credits": {
+          "type": "integer",
+          "description": "Remaining free trial credits (every account starts with 50)."
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "free",
+            "plan"
+          ],
+          "description": "Which balance paid for this request. Free credits are spent first."
+        }
+      }
+    },
+    "Scores": {
+      "type": "object",
+      "description": "0–100 display grades. Unsupported dimensions are null; null is never a zero score. `integrity` is completeness.",
+      "properties": {
+        "overall": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "pronunciation": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "initial": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "final": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "tone": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "integrity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "fluency": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "rhythm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "additionalProperties": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 100
+      }
+    }
+  }
+}

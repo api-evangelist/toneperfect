@@ -1,0 +1,83 @@
+generated: '2026-10-08'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/toneperfect-openapi.json
+format: custom
+envelope:
+  media_type: application/json
+  schema: Error
+coverage:
+  operations: 5
+  statuses_declared: 10
+problems:
+- status: 400
+  title: Bad Request
+  description: 'Bad request. Possible `error.code` values:'
+  operations: 1
+  media_types:
+  - application/json
+  schema: Error
+- status: 401
+  title: Unauthorized
+  description: 'Unauthorized. Possible `error.code` values:'
+  operations: 1
+  media_types:
+  - application/json
+  schema: Error
+- status: 402
+  title: Payment Required
+  description: 'Payment required. Possible `error.code` values:'
+  operations: 1
+  media_types:
+  - application/json
+  schema: Error
+- status: 408
+  title: Request Timeout
+  description: 'Upload timeout. Possible `error.code` values:'
+  operations: 1
+  media_types:
+  - application/json
+  schema: Error
+- status: 409
+  title: Conflict
+  description: 'Idempotency conflict. Possible `error.code` values:'
+  operations: 1
+  media_types:
+  - application/json
+  schema: Error
+- status: 413
+  title: Content Too Large
+  description: 'Payload too large. Possible `error.code` values:'
+  operations: 1
+  media_types:
+  - application/json
+  schema: Error
+- status: 415
+  title: Unsupported Media Type
+  description: Send JSON.
+  operations: 1
+  media_types:
+  - application/json
+  schema: Error
+- status: 422
+  title: Unprocessable Content
+  description: 'Unprocessable request. Possible `error.code` values:'
+  operations: 2
+  media_types:
+  - application/json
+  schema: Error
+- status: 429
+  title: Too Many Requests
+  description: 'Too many requests. Possible `error.code` values:'
+  operations: 1
+  media_types:
+  - application/json
+  schema: Error
+- status: 503
+  title: Service Unavailable
+  description: 'Service unavailable. Possible `error.code` values:'
+  operations: 2
+  media_types:
+  - application/json
+  schema: Error

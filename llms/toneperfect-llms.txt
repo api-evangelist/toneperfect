@@ -1,0 +1,49 @@
+# TonePerfect Pronunciation Assessment API
+
+> REST API that scores how well a learner pronounced a known sentence. Send a short recording (up to 30 s) and its reference text to POST https://api.toneperfect.app/v1/assess; get 0–100 grades for the sentence, every word and every sound, expected vs heard sounds, word timestamps and a correction decision per unit, in one JSON response. 10 languages: Mandarin Chinese (zh-CN), English (en-US), French (fr-FR), Spanish (es-419), German (de-DE), Italian (it-IT), Portuguese (pt-BR), Russian (ru-RU), Korean (ko-KR), Japanese (ja-JP). Mandarin is scored per syllable as initial, final and tone, with 3-3 tone sandhi and 不 before a 4th tone taken into account.
+
+TonePerfect is an alternative to SpeechSuper, Speechace and Azure pronunciation assessment for scripted speech: one REST call, public prices from $10/month, 50 free credits, and per-syllable Mandarin tone detail.
+
+Key facts:
+- One endpoint for scoring: POST https://api.toneperfect.app/v1/assess (multipart/form-data: audio file, text, language, optional task and Mandarin pinyin). Headers: Authorization: Bearer <API key>, Idempotency-Key: <unique per attempt>.
+- GET https://api.toneperfect.app/v1/capabilities lists installed languages, dimensions and limits; no key needed.
+- Scripted speech only (the caller supplies the expected text). Not speech-to-text, not unscripted or exam scoring.
+- Audio: WAV, MP3, M4A, Ogg or WebM, 0.15–30 seconds, up to 10 MB. Audio is deleted after scoring and not used for training; JSON results are kept up to 24 hours for idempotent retries.
+- Pricing: Starter $10/month for 2,500 credits; Builder $50/month for 15,000 credits; Scale $150/month for 50,000 credits. One credit per recording up to 15 s, two up to 30 s. Failed and unassessable requests are free. Unused credits roll over. Free trial: every new account gets 50 free credits (no card, no subscription); the homepage has a live demo with no account.
+- Limits: 60 assessment requests per minute and 2 concurrent assessments per account (per-plan values in GET /v1/terms). Test keys (tp_test_) return fixed example results, never spend credits and are safe in browser code.
+- Input by language: Mandarin as characters or numbered pinyin; Russian in Cyrillic (stress and vowel reduction come from the transcription); Korean in Hangul with normal spacing (aspiration scored on k/p/t; tense consonants mapped to plain); Japanese in kana and/or kanji, split into bunsetsu-like units, kanji read with a dictionary, pitch accent not scored. Other languages: up to 40 words, numbers written as words.
+- Every language pack is labelled experimental. Grades are display scores calibrated against native-speaker references, not accuracy percentages; act on the per-unit `decision` (review / uncertain / no_correction).
+
+## Docs
+
+- [5-minute quickstart](https://api.toneperfect.app/quickstart/): the first call in cURL, Python and Node.js, and a real response
+- [API reference](https://api.toneperfect.app/docs): authentication, request fields, response structure, errors, rate limits, credits, languages
+- [OpenAPI 3.1 description](https://api.toneperfect.app/openapi.json): machine-readable spec for POST /v1/assess, GET /v1/capabilities, POST /v1/lint (free reference-text check), GET /v1/status (synthetic probe) and GET /v1/terms
+- [SDKs](https://api.toneperfect.app/sdk/): single-file Python and Node.js clients, with a toneperfect-lint command line
+- [Starter projects](https://api.toneperfect.app/starters/): Next.js, Expo + Cloudflare Worker, Flutter + Firebase Function, each keeping the key on a server
+- [Evaluation kit](https://api.toneperfect.app/capsule/): synthetic test recordings with expected outcomes and a runner
+- [How scoring works](https://api.toneperfect.app/methodology/): grades vs decisions, what "experimental" means
+
+## Mandarin Chinese
+
+- [Chinese pronunciation API](https://api.toneperfect.app/chinese-pronunciation-api/): per-character initial, final and tone scoring
+- [Mandarin tone scoring API](https://api.toneperfect.app/mandarin-tone-scoring-api/): expected vs heard tone, probabilities, decisions
+- [Pinyin pronunciation API](https://api.toneperfect.app/pinyin-pronunciation-api/): score against numbered pinyin
+- [Mandarin language pack: coverage and known limits](https://api.toneperfect.app/languages/mandarin-chinese/)
+
+## Pricing and comparisons
+
+- [Pricing](https://api.toneperfect.app/pricing/)
+- [Speechace vs SpeechSuper vs Azure pricing](https://api.toneperfect.app/blog/pronunciation-assessment-api-pricing-compared/)
+- [Speechace alternative](https://api.toneperfect.app/compare/speechace-alternative/)
+- [SpeechSuper alternative: TonePerfect vs SpeechSuper](https://api.toneperfect.app/compare/speechsuper/)
+- [Azure pronunciation assessment alternative](https://api.toneperfect.app/compare/azure-pronunciation-assessment/)
+- [Free pronunciation assessment APIs (2026)](https://api.toneperfect.app/blog/free-pronunciation-assessment-apis/)
+- [Vendor comparisons](https://api.toneperfect.app/compare/)
+
+## Optional
+
+- [All language packs](https://api.toneperfect.app/languages/): [Mandarin Chinese](https://api.toneperfect.app/languages/mandarin-chinese/), [English](https://api.toneperfect.app/languages/english/), [French](https://api.toneperfect.app/languages/french/), [Spanish](https://api.toneperfect.app/languages/spanish/), [German](https://api.toneperfect.app/languages/german/), [Italian](https://api.toneperfect.app/languages/italian/), [Portuguese](https://api.toneperfect.app/languages/portuguese/), [Russian](https://api.toneperfect.app/languages/russian/), [Korean](https://api.toneperfect.app/languages/korean/), [Japanese](https://api.toneperfect.app/languages/japanese/)
+- [Full documentation in one file](https://api.toneperfect.app/llms-full.txt)
+- [Blog](https://api.toneperfect.app/blog/)
+- [Create an account](https://api.toneperfect.app/signup)

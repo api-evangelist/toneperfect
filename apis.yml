@@ -1,28 +1,147 @@
 aid: toneperfect
 name: TonePerfect (Pronunciation Assessment API)
-description: 'TonePerfect (Pronunciation Assessment API) is a company surfaced via the API Evangelist
-  harvest backlog (source: new-submission) and added to the network as a stub for full-pipeline profiling.'
+image: https://api.toneperfect.app/static/og-image.png
+description: TonePerfect offers an AI‑powered pronunciation assessment API for language learning applications. It supports ten languages and provides
+  a single endpoint that returns a detailed score (0‑100) for the whole sentence, each word, and individual sounds, including tone information
+  for Mandarin. The service includes free tier credits, transparent pricing, and robust error handling, making it suitable for developers integrating
+  speech evaluation into apps.
 url: https://raw.githubusercontent.com/api-evangelist/toneperfect/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:new-submission
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-10-08 (modular-v1; was harvest)
 specificationVersion: '0.20'
 created: '2026-10-08'
 modified: '2026-10-08'
 tags:
 - Company
-apis: []
+- AI
+- Speech
+- Language-Learning
+- Pronunciation
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/toneperfect-agentic-access.yml
+- type: Plans
+  url: plans/toneperfect-plans-pricing.yml
+- type: Spectral
+  url: rules/toneperfect-rules.yml
+- type: JSONLD
+  url: json-ld/toneperfect-context.jsonld
+- type: Vocabulary
+  url: vocabulary/toneperfect-vocabulary.yml
+- type: DataModel
+  url: data-model/toneperfect-data-model.yml
+- type: Idempotency
+  url: conventions/toneperfect-conventions.yml
+- type: Conventions
+  url: conventions/toneperfect-conventions.yml
+- type: Authentication
+  url: authentication/toneperfect-authentication.yml
+- type: ErrorCatalog
+  url: errors/toneperfect-problem-types.yml
+- type: Conformance
+  url: conformance/toneperfect-conformance.yml
+- type: LLMsTxt
+  url: llms/toneperfect-llms.txt
+- type: Hosts
+  url: hosts/toneperfect-hosts.yml
+- type: Vendors
+  url: vendors/toneperfect-vendors.yml
+- type: Packages
+  url: packages/toneperfect-packages.yml
+- type: TermsOfService
+  url: https://api.toneperfect.app/terms/
+- type: StatusPage
+  url: https://api.toneperfect.app/status/
+- type: Security
+  url: https://api.toneperfect.app/security/
+- type: SDKs
+  url: https://api.toneperfect.app/sdk/
+- type: PrivacyPolicy
+  url: https://api.toneperfect.app/privacy/
+- type: Pricing
+  url: https://api.toneperfect.app/pricing/
+- type: Login
+  url: https://api.toneperfect.app/login
+- type: ChangeLog
+  url: https://api.toneperfect.app/changelog/
+- type: Blog
+  url: https://api.toneperfect.app/blog/
+- type: GettingStarted
+  url: https://api.toneperfect.app/quickstart/
+- type: DomainSecurity
+  url: security/toneperfect-domain-security.yml
 - type: Website
   url: https://api.toneperfect.app
 - type: Documentation
   url: https://api.toneperfect.app/docs
+apis:
+- aid: toneperfect:toneperfect-assessment-api
+  name: TonePerfect (Pronunciation Assessment API) Assessment API
+  description: >-
+    The Assessment API from TonePerfect (Pronunciation Assessment API) — 1 operation(s) for assessment.
+  humanURL: https://api.toneperfect.app/docs
+  tags:
+  - Assessment
+  properties:
+  - type: OpenAPI
+    url: openapi/toneperfect-assessment-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/toneperfect-assessment-schema.json
+  - type: JSONSchema
+    url: json-schema/toneperfect-capabilities-schema.json
+  - type: JSONSchema
+    url: json-schema/toneperfect-compact-assessment-schema.json
+  - type: JSONSchema
+    url: json-schema/toneperfect-status-window-schema.json
+- aid: toneperfect:toneperfect-capabilities-api
+  name: TonePerfect (Pronunciation Assessment API) Capabilities API
+  description: >-
+    The Capabilities API from TonePerfect (Pronunciation Assessment API) — 1 operation(s) for capabilities.
+  humanURL: https://api.toneperfect.app/docs
+  tags:
+  - Capabilities
+  properties:
+  - type: OpenAPI
+    url: openapi/toneperfect-capabilities-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/toneperfect-assessment-schema.json
+  - type: JSONSchema
+    url: json-schema/toneperfect-capabilities-schema.json
+  - type: JSONSchema
+    url: json-schema/toneperfect-compact-assessment-schema.json
+  - type: JSONSchema
+    url: json-schema/toneperfect-status-window-schema.json
+- aid: toneperfect:toneperfect-utilities-api
+  name: TonePerfect (Pronunciation Assessment API) Utilities API
+  description: >-
+    The Utilities API from TonePerfect (Pronunciation Assessment API) — 3 operation(s) for utilities.
+  humanURL: https://api.toneperfect.app/docs
+  tags:
+  - Utilities
+  properties:
+  - type: OpenAPI
+    url: openapi/toneperfect-utilities-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/toneperfect-assessment-schema.json
+  - type: JSONSchema
+    url: json-schema/toneperfect-capabilities-schema.json
+  - type: JSONSchema
+    url: json-schema/toneperfect-compact-assessment-schema.json
+  - type: JSONSchema
+    url: json-schema/toneperfect-status-window-schema.json
 x-submission-notes: Solo founder, gmail contact. Domain toneperfect.app; submitter asks for one API only.
 x-submission-probe: root/docs 200; openapi.json 200 (OpenAPI 3.1); llms.txt 200; soft-404 clean (404)
 x-submitted-by: nicolas.maissouradze@gmail.com (apis.io/add, 2026-10-07T07:41:08.244Z)
+x-enrichment:
+  date: '2026-10-08'
+  status: enriched
+  artifacts_added: 19
+  pass: modular-v1
+  engine: identity=local,contract=local,surfaces=local,docs=local,regulatory=local
