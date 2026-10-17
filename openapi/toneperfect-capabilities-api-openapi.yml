@@ -37,6 +37,59 @@ paths:
                 $ref: '#/components/schemas/Error'
 components:
   schemas:
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              enum:
+              - invalid_multipart
+              - invalid_api_key
+              - subscription_required
+              - insufficient_credits
+              - payment_balance_due
+              - upload_timeout
+              - idempotency_conflict
+              - request_pending
+              - idempotency_expired
+              - upload_too_large
+              - invalid_idempotency_key
+              - missing_audio
+              - invalid_reference
+              - invalid_task
+              - invalid_test_outcome
+              - invalid_input
+              - unsupported_language
+              - invalid_audio
+              - invalid_assessment
+              - rate_limit
+              - account_busy
+              - free_capacity
+              - gateway_busy
+              - decoder_busy
+              - audio_decoder_unavailable
+              - engine_unavailable
+              - request_interrupted
+              description: Stable machine-readable code. Branch on this, not on the message.
+            message:
+              type: string
+          additionalProperties: true
+        request_id:
+          type: string
+          description: Present on errors raised before an assessment was stored.
+        id:
+          type: string
+          description: Present on finalized failures (stored under the Idempotency-Key).
+        billing:
+          $ref: '#/components/schemas/Billing'
     Capabilities:
       type: object
       properties:
@@ -107,59 +160,6 @@ components:
               examples:
               - 2
       additionalProperties: true
-    Error:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - code
-          - message
-          properties:
-            code:
-              type: string
-              enum:
-              - invalid_multipart
-              - invalid_api_key
-              - subscription_required
-              - insufficient_credits
-              - payment_balance_due
-              - upload_timeout
-              - idempotency_conflict
-              - request_pending
-              - idempotency_expired
-              - upload_too_large
-              - invalid_idempotency_key
-              - missing_audio
-              - invalid_reference
-              - invalid_task
-              - invalid_test_outcome
-              - invalid_input
-              - unsupported_language
-              - invalid_audio
-              - invalid_assessment
-              - rate_limit
-              - account_busy
-              - free_capacity
-              - gateway_busy
-              - decoder_busy
-              - audio_decoder_unavailable
-              - engine_unavailable
-              - request_interrupted
-              description: Stable machine-readable code. Branch on this, not on the message.
-            message:
-              type: string
-          additionalProperties: true
-        request_id:
-          type: string
-          description: Present on errors raised before an assessment was stored.
-        id:
-          type: string
-          description: Present on finalized failures (stored under the Idempotency-Key).
-        billing:
-          $ref: '#/components/schemas/Billing'
     Billing:
       type: object
       required:

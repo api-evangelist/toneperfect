@@ -1,21 +1,24 @@
 {
   "provider": "toneperfect",
   "sources": [
-    "toneperfect-openapi.json"
+    "_original/toneperfect-openapi.json"
   ],
   "outputs": [
     "toneperfect-assessment-api-openapi.yml",
     "toneperfect-capabilities-api-openapi.yml",
     "toneperfect-utilities-api-openapi.yml"
   ],
-  "archived": [
-    "archived openapi/toneperfect-openapi.json"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "toneperfect-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "apis.yml register: written (+3 apis, 3 total)"
+    "apis.yml register: already-registered"
   ],
-  "skipped": []
+  "skipped": [
+    "toneperfect-assessment-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "toneperfect-capabilities-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "toneperfect-utilities-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
