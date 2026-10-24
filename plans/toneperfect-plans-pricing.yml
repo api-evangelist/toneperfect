@@ -22,3 +22,28 @@ plans:
   price: 150
   description: 50,000 credits every month
 docs: https://api.toneperfect.app/pricing/
+x-canonical:
+  generated: '2026-10-23'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - subscription
+  units: []
+  plans:
+  - name: Starter
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Builder
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Scale
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
